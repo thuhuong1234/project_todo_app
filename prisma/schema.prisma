@@ -1,0 +1,70 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int      @id @default(autoincrement())
+  username String   @db.VarChar(255)
+  password String   @db.VarChar(255)
+  email    String   @unique @db.VarChar(255)
+  role     Role     @default(Member)
+  phone    String?  @unique @db.VarChar(11)
+  avatar   String?  @db.VarChar(255)
+  createAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+
+  tasks   Task[]
+  reviews Reviews[]
+
+  @@map("users")
+}
+
+model Task {
+  id            Int      @id @default(autoincrement())
+  taskname      String   @db.VarChar(255)
+  description   String   @db.VarChar(255)
+  startTime     DateTime @default(now())
+  endTime       DateTime @updatedAt
+  participantId Int
+  participants  User     @relation(fields: [participantId], references: [id])
+  categoryId    Int
+  category      Category @relation(fields: [categoryId], references: [id])
+
+  reviews Reviews[]
+
+  @@map("tasks")
+}
+
+model Category {
+  id           Int    @id @default(autoincrement())
+  categoryname String @db.VarChar(255)
+  description  String @db.VarChar(255)
+
+  tasks Task[]
+
+  @@map("categories")
+}
+
+model Reviews {
+  id         Int    @id @default(autoincrement())
+  content    String @db.VarChar(255)
+  taskId     Int
+  task       Task   @relation(fields: [taskId], references: [id])
+  reviewerId Int
+  reviewer   User   @relation(fields: [reviewerId], references: [id])
+
+  @@map("reviews")
+}
+
+enum Role {
+  Leader
+  Member
+}
