@@ -106,11 +106,11 @@ enum Role {
   Leader
   User
 }
-
 enum Stage {
   Todo
   InProgress
   Review
   Testing
   Done
+
 }
