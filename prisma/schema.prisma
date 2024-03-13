@@ -15,30 +15,28 @@ model User {
   username String   @db.VarChar(255)
   password String   @db.VarChar(255)
   email    String   @unique @db.VarChar(255)
-  role     Role     @default(Member)
+  role     Role     @default(User)
   phone    String?  @unique @db.VarChar(11)
   avatar   String?  @db.VarChar(255)
   createAt DateTime @default(now())
   updateAt DateTime @updatedAt
 
-  tasks   Task[]
-  reviews Reviews[]
+  tasksOfUser   TaskOfUser[]
+  reviewsByUser ReviewOfUser[]
 
   @@map("users")
 }
 
 model Task {
-  id            Int      @id @default(autoincrement())
-  taskname      String   @db.VarChar(255)
-  description   String   @db.VarChar(255)
-  startTime     DateTime @default(now())
-  endTime       DateTime @updatedAt
-  participantId Int
-  participants  User     @relation(fields: [participantId], references: [id])
-  categoryId    Int
-  category      Category @relation(fields: [categoryId], references: [id])
+  id          Int      @id @default(autoincrement())
+  taskname    String   @db.VarChar(255)
+  description String   @db.VarChar(255)
+  startTime   DateTime @default(now())
+  endTime     DateTime @updatedAt
 
-  reviews Reviews[]
+  tasksOfUser     TaskOfUser[]
+  tasksOfCategory TaskOfCategory[]
+  reviewsOfTask   ReviewOfTask[]
 
   @@map("tasks")
 }
@@ -48,23 +46,62 @@ model Category {
   categoryname String @db.VarChar(255)
   description  String @db.VarChar(255)
 
-  tasks Task[]
+  tasksOfCategory TaskOfCategory[]
 
   @@map("categories")
 }
 
 model Reviews {
-  id         Int    @id @default(autoincrement())
-  content    String @db.VarChar(255)
-  taskId     Int
-  task       Task   @relation(fields: [taskId], references: [id])
-  reviewerId Int
-  reviewer   User   @relation(fields: [reviewerId], references: [id])
+  id      Int    @id @default(autoincrement())
+  content String @db.VarChar(255)
+
+  reviewsOfTask ReviewOfTask[]
+  reviewsByUser ReviewOfUser[]
 
   @@map("reviews")
 }
 
+model TaskOfUser {
+  participantId Int
+  participants  User @relation(fields: [participantId], references: [id])
+  task          Task @relation(fields: [taskId], references: [id])
+  taskId        Int
+
+  @@id([participantId, taskId])
+  @@map("tasks_of_user")
+}
+
+model TaskOfCategory {
+  taskId     Int
+  task       Task     @relation(fields: [taskId], references: [id])
+  categoryId Int
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  @@id([taskId, categoryId])
+  @@map("tasks_of_category")
+}
+
+model ReviewOfTask {
+  taskId   Int
+  task     Task    @relation(fields: [taskId], references: [id])
+  reviewId Int
+  review   Reviews @relation(fields: [reviewId], references: [id])
+
+  @@id([taskId, reviewId])
+  @@map("reviews_of_task")
+}
+
+model ReviewOfUser {
+  reviewerId Int
+  reviewer   User    @relation(fields: [reviewerId], references: [id])
+  reviewId   Int
+  review     Reviews @relation(fields: [reviewId], references: [id])
+
+  @@id([reviewerId, reviewId])
+  @@map("reviews_of_user")
+}
+
 enum Role {
   Leader
-  Member
+  User
 }
