@@ -7,6 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 import configuration from './common/config/configuration';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { TasksModule } from './modules/tasks/tasks.module';
+import { ReviewsModule } from './modules/reviews/reviews.module';
 @Module({
   imports: [
     UsersModule,
@@ -14,6 +15,7 @@ import { TasksModule } from './modules/tasks/tasks.module';
     ConfigModule.forRoot({ load: [configuration] }),
     CategoriesModule,
     TasksModule,
+    ReviewsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

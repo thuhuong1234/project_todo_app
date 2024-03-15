@@ -51,7 +51,6 @@ export class TasksService {
       },
       data: updateTaskDto,
     });
-    return `This action updates a #${id} task`;
   }
 
   async remove(id: number) {
