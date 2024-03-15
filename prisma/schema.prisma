@@ -31,6 +31,7 @@ model Task {
   id          Int      @id @default(autoincrement())
   taskname    String   @db.VarChar(255)
   description String   @db.VarChar(255)
+  stage       Stage    @default(Todo)
   startTime   DateTime @default(now())
   endTime     DateTime @updatedAt
 
@@ -104,4 +105,12 @@ model ReviewOfUser {
 enum Role {
   Leader
   User
+}
+enum Stage {
+  Todo
+  InProgress
+  Review
+  Testing
+  Done
+
 }

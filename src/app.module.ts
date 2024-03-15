@@ -6,12 +6,14 @@ import { AuthModule } from './modules/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import configuration from './common/config/configuration';
 import { CategoriesModule } from './modules/categories/categories.module';
+import { TasksModule } from './modules/tasks/tasks.module';
 @Module({
   imports: [
     UsersModule,
     AuthModule,
     ConfigModule.forRoot({ load: [configuration] }),
     CategoriesModule,
+    TasksModule,
   ],
   controllers: [AppController],
   providers: [AppService],
