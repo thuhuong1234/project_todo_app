@@ -118,4 +118,44 @@ export class TasksService {
 
     return userToTask;
   }
+  async removeUserFromTask(participantId: number, taskId: number) {
+    const task = await this.prisma.task.findUnique({
+      where: {
+        id: taskId,
+      },
+    });
+    if (!task) {
+      throw new NotFoundException('Task not found');
+    }
+
+    const participant = await this.prisma.user.findUnique({
+      where: {
+        id: participantId,
+      },
+    });
+    if (!participant) {
+      throw new NotFoundException('Participant not found');
+    }
+
+    const isExistUserInTask = await this.prisma.taskOfUser.findUnique({
+      where: {
+        participantId_taskId: {
+          participantId,
+          taskId,
+        },
+      },
+    });
+    if (!isExistUserInTask) {
+      throw new BadRequestException('Participant does not exist in task');
+    }
+
+    return await this.prisma.taskOfUser.delete({
+      where: {
+        participantId_taskId: {
+          participantId,
+          taskId,
+        },
+      },
+    });
+  }
 }

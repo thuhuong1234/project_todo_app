@@ -60,4 +60,13 @@ export class TasksController {
   ) {
     return this.tasksService.addUserToTask(+participantId, +taskId, Role);
   }
+
+  @Delete(':taskId/participants')
+  @Roles(Role.Leader)
+  removeUserFromTask(
+    @Param('taskId') taskId: string,
+    @Query('participantId') participantId: string,
+  ) {
+    return this.tasksService.removeUserFromTask(+participantId, +taskId);
+  }
 }
