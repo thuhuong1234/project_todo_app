@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { PrismaService } from 'prisma.service';
@@ -68,5 +72,50 @@ export class TasksService {
         id,
       },
     });
+  }
+
+  async addUserToTask(participantId: number, taskId: number, Role: string) {
+    const task = await this.prisma.task.findUnique({
+      where: {
+        id: taskId,
+      },
+    });
+    if (!task) {
+      throw new NotFoundException('Task not found');
+    }
+
+    const participant = await this.prisma.user.findUnique({
+      where: {
+        id: participantId,
+      },
+    });
+    if (!participant) {
+      throw new NotFoundException('Participant not found');
+    }
+
+    if (!['leader', 'user'].includes(participant.role.toLowerCase())) {
+      throw new BadRequestException('Invalid role');
+    }
+
+    const isExistUserInTask = await this.prisma.taskOfUser.findUnique({
+      where: {
+        participantId_taskId: {
+          participantId,
+          taskId,
+        },
+      },
+    });
+    if (isExistUserInTask) {
+      throw new BadRequestException('User already in task');
+    }
+
+    const userToTask = await this.prisma.taskOfUser.create({
+      data: {
+        participantId,
+        taskId,
+      },
+    });
+
+    return userToTask;
   }
 }

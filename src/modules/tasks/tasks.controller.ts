@@ -50,4 +50,14 @@ export class TasksController {
   remove(@Param('id') id: string) {
     return this.tasksService.remove(+id);
   }
+
+  @Post(':taskId/participants')
+  @Roles(Role.Leader)
+  addUserToTask(
+    @Param('taskId') taskId: string,
+    @Query('participantId') participantId: string,
+    @Query('Role') Role: string,
+  ) {
+    return this.tasksService.addUserToTask(+participantId, +taskId, Role);
+  }
 }
