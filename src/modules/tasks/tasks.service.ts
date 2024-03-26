@@ -31,6 +31,13 @@ export class TasksService {
       where: {
         id,
       },
+      include: {
+        tasksOfUser: {
+          include: {
+            participants: true,
+          },
+        },
+      },
     });
     if (!task) {
       throw new NotFoundException('Task not found');
