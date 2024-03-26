@@ -62,4 +62,13 @@ export class CategoriesController {
   ) {
     return this.categoriesService.addTaskInCategory(+taskId, +categoryId);
   }
+
+  @Delete(':categoryId/tasks')
+  @Roles(Role.Leader)
+  removeTaskFromCategory(
+    @Param('categoryId') categoryId: string,
+    @Query('taskId') taskId: string,
+  ) {
+    return this.categoriesService.removeTaskFromCategory(+taskId, +categoryId);
+  }
 }
