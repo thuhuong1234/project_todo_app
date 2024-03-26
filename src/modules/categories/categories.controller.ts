@@ -53,4 +53,13 @@ export class CategoriesController {
   remove(@Param('id') id: string) {
     return this.categoriesService.remove(+id);
   }
+
+  @Post(':categoryId/tasks')
+  @Roles(Role.Leader)
+  addTaskInCategory(
+    @Param('categoryId') categoryId: string,
+    @Query('taskId') taskId: string,
+  ) {
+    return this.categoriesService.addTaskInCategory(+taskId, +categoryId);
+  }
 }

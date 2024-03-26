@@ -31,6 +31,13 @@ export class CategoriesService {
       where: {
         id,
       },
+      include: {
+        tasksOfCategory: {
+          include: {
+            task: true,
+          },
+        },
+      },
     });
     if (!category) {
       throw new NotFoundException('Category not found');
@@ -67,6 +74,85 @@ export class CategoriesService {
     return await this.prisma.category.delete({
       where: {
         id,
+      },
+    });
+  }
+
+  async addTaskInCategory(taskId: number, categoryId: number) {
+    const category = await this.prisma.category.findUnique({
+      where: {
+        id: categoryId,
+      },
+    });
+    if (!category) {
+      throw new NotFoundException('Category not found');
+    }
+
+    const task = await this.prisma.task.findUnique({
+      where: {
+        id: taskId,
+      },
+    });
+    if (!task) {
+      throw new NotFoundException('Task not found');
+    }
+
+    const isExistTaskInCategory = await this.prisma.taskOfCategory.findUnique({
+      where: {
+        taskId_categoryId: {
+          taskId,
+          categoryId,
+        },
+      },
+    });
+    if (isExistTaskInCategory) {
+      throw new NotFoundException('Task already exist in category!');
+    }
+
+    return await this.prisma.taskOfCategory.create({
+      data: {
+        taskId,
+        categoryId,
+      },
+    });
+  }
+  async removeTaskFromCategory(taskId: number, categoryId: number) {
+    const category = await this.prisma.category.findUnique({
+      where: {
+        id: categoryId,
+      },
+    });
+    if (!category) {
+      throw new NotFoundException('Category not found');
+    }
+
+    const task = await this.prisma.task.findUnique({
+      where: {
+        id: taskId,
+      },
+    });
+    if (!task) {
+      throw new NotFoundException('Task not found');
+    }
+
+    const isExistTaskInCategory = await this.prisma.taskOfCategory.findUnique({
+      where: {
+        taskId_categoryId: {
+          taskId,
+          categoryId,
+        },
+      },
+    });
+    if (!isExistTaskInCategory) {
+      throw new NotFoundException('Task does not exist in category');
+    }
+
+    return await this.prisma.taskOfCategory.delete({
+      where: {
+        taskId_categoryId: {
+          taskId,
+          categoryId,
+        },
       },
     });
   }
