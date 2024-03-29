@@ -21,8 +21,8 @@ model User {
   createAt DateTime @default(now())
   updateAt DateTime @updatedAt
 
-  tasksOfUser   TaskOfUser[]
-  reviewsByUser ReviewOfUser[]
+  tasksOfUser TaskOfUser[]
+  reviews     Review[]
 
   @@map("users")
 }
@@ -52,12 +52,13 @@ model Category {
   @@map("categories")
 }
 
-model Reviews {
-  id      Int    @id @default(autoincrement())
-  content String @db.VarChar(255)
+model Review {
+  id         Int    @id @default(autoincrement())
+  content    String @db.VarChar(255)
+  reviewerId Int?
+  reviewer   User?  @relation(fields: [reviewerId], references: [id])
 
   reviewsOfTask ReviewOfTask[]
-  reviewsByUser ReviewOfUser[]
 
   @@map("reviews")
 }
@@ -84,33 +85,23 @@ model TaskOfCategory {
 
 model ReviewOfTask {
   taskId   Int
-  task     Task    @relation(fields: [taskId], references: [id])
+  task     Task   @relation(fields: [taskId], references: [id])
   reviewId Int
-  review   Reviews @relation(fields: [reviewId], references: [id])
+  review   Review @relation(fields: [reviewId], references: [id])
 
   @@id([taskId, reviewId])
   @@map("reviews_of_task")
-}
-
-model ReviewOfUser {
-  reviewerId Int
-  reviewer   User    @relation(fields: [reviewerId], references: [id])
-  reviewId   Int
-  review     Reviews @relation(fields: [reviewId], references: [id])
-
-  @@id([reviewerId, reviewId])
-  @@map("reviews_of_user")
 }
 
 enum Role {
   Leader
   User
 }
+
 enum Stage {
   Todo
   InProgress
   Review
   Testing
   Done
-
 }
