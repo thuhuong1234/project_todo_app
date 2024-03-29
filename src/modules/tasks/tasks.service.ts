@@ -81,7 +81,7 @@ export class TasksService {
     });
   }
 
-  async addUserToTask(participantId: number, taskId: number, Role: string) {
+  async validate(participantId: number, taskId: number) {
     const task = await this.prisma.task.findUnique({
       where: {
         id: taskId,
@@ -99,6 +99,15 @@ export class TasksService {
     if (!participant) {
       throw new NotFoundException('Participant not found');
     }
+  }
+  async addUserToTask(participantId: number, taskId: number, Role: string) {
+    await this.validate(participantId, taskId);
+
+    const participant = await this.prisma.user.findUnique({
+      where: {
+        id: participantId,
+      },
+    });
 
     if (!['leader', 'user'].includes(participant.role.toLowerCase())) {
       throw new BadRequestException('Invalid role');
@@ -126,23 +135,7 @@ export class TasksService {
     return userToTask;
   }
   async removeUserFromTask(participantId: number, taskId: number) {
-    const task = await this.prisma.task.findUnique({
-      where: {
-        id: taskId,
-      },
-    });
-    if (!task) {
-      throw new NotFoundException('Task not found');
-    }
-
-    const participant = await this.prisma.user.findUnique({
-      where: {
-        id: participantId,
-      },
-    });
-    if (!participant) {
-      throw new NotFoundException('Participant not found');
-    }
+    await this.validate(participantId, taskId);
 
     const isExistUserInTask = await this.prisma.taskOfUser.findUnique({
       where: {
