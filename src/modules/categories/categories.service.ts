@@ -77,8 +77,7 @@ export class CategoriesService {
       },
     });
   }
-
-  async addTaskInCategory(taskId: number, categoryId: number) {
+  async validate(taskId: number, categoryId: number) {
     const category = await this.prisma.category.findUnique({
       where: {
         id: categoryId,
@@ -96,6 +95,9 @@ export class CategoriesService {
     if (!task) {
       throw new NotFoundException('Task not found');
     }
+  }
+  async addTaskInCategory(taskId: number, categoryId: number) {
+    await this.validate(taskId, categoryId);
 
     const isExistTaskInCategory = await this.prisma.taskOfCategory.findUnique({
       where: {
@@ -117,23 +119,7 @@ export class CategoriesService {
     });
   }
   async removeTaskFromCategory(taskId: number, categoryId: number) {
-    const category = await this.prisma.category.findUnique({
-      where: {
-        id: categoryId,
-      },
-    });
-    if (!category) {
-      throw new NotFoundException('Category not found');
-    }
-
-    const task = await this.prisma.task.findUnique({
-      where: {
-        id: taskId,
-      },
-    });
-    if (!task) {
-      throw new NotFoundException('Task not found');
-    }
+    await this.validate(taskId, categoryId);
 
     const isExistTaskInCategory = await this.prisma.taskOfCategory.findUnique({
       where: {
