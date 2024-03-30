@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   DefaultValuePipe,
+  Req,
 } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto } from './dto/create-review.dto';
@@ -21,8 +22,10 @@ export class ReviewsController {
 
   @Post()
   @Roles(Role.Leader)
-  create(@Body() createReviewDto: CreateReviewDto) {
-    return this.reviewsService.create(createReviewDto);
+  create(@Req() request: any, @Body() createReviewDto: CreateReviewDto) {
+    const reviewerId = request.user.id;
+    const reviewData = { ...createReviewDto, reviewerId };
+    return this.reviewsService.create(reviewData);
   }
 
   @Get()

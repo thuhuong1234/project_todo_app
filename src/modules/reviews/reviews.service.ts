@@ -7,13 +7,13 @@ import { PrismaService } from 'prisma.service';
 export class ReviewsService {
   constructor(private readonly prisma: PrismaService) {}
   async create(createReviewDto: CreateReviewDto) {
-    return await this.prisma.reviews.create({ data: createReviewDto });
+    return await this.prisma.review.create({ data: createReviewDto });
   }
 
   async findAll(page: number, limit: number) {
     limit = parseInt(limit.toString());
     const skip = (page - 1) * limit;
-    const reviews = await this.prisma.reviews.findMany({
+    const reviews = await this.prisma.review.findMany({
       skip,
       take: limit,
     });
@@ -23,7 +23,7 @@ export class ReviewsService {
   }
 
   async findOne(id: number) {
-    const review = await this.prisma.reviews.findUnique({
+    const review = await this.prisma.review.findUnique({
       where: { id },
     });
     if (!review) {
@@ -34,28 +34,28 @@ export class ReviewsService {
   }
 
   async update(id: number, updateReviewDto: UpdateReviewDto) {
-    const review = await this.prisma.reviews.findUnique({
+    const review = await this.prisma.review.findUnique({
       where: { id },
     });
     if (!review) {
       throw new NotFoundException('Review not found');
     }
 
-    return await this.prisma.reviews.update({
+    return await this.prisma.review.update({
       where: { id },
       data: updateReviewDto,
     });
   }
 
   async remove(id: number) {
-    const review = await this.prisma.reviews.findUnique({
+    const review = await this.prisma.review.findUnique({
       where: { id },
     });
     if (!review) {
       throw new NotFoundException('Review not found');
     }
 
-    return await this.prisma.reviews.delete({
+    return await this.prisma.review.delete({
       where: { id },
     });
   }
