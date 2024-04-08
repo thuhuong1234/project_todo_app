@@ -205,4 +205,28 @@ export class TasksService {
       },
     });
   }
+  async removeReviewFromTask(reviewId: number, taskId: number) {
+    await this.validateTaskAndReview(taskId, reviewId);
+
+    const isExistReviewInTask = await this.prisma.reviewOfTask.findUnique({
+      where: {
+        taskId_reviewId: {
+          taskId,
+          reviewId,
+        },
+      },
+    });
+    if (!isExistReviewInTask) {
+      throw new BadRequestException('Review does not exist  in this task');
+    }
+
+    return await this.prisma.reviewOfTask.delete({
+      where: {
+        taskId_reviewId: {
+          taskId,
+          reviewId,
+        },
+      },
+    });
+  }
 }

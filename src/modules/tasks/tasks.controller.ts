@@ -78,4 +78,13 @@ export class TasksController {
   ) {
     return this.tasksService.addReviewToTask(+reviewId, +taskId);
   }
+
+  @Delete(':taskId/reviews')
+  @Roles(Role.Leader)
+  removeReviewFromTask(
+    @Param('taskId') taskId: string,
+    @Query('reviewId') reviewId: string,
+  ) {
+    return this.tasksService.removeReviewFromTask(+reviewId, +taskId);
+  }
 }
