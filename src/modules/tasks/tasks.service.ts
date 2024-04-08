@@ -37,6 +37,11 @@ export class TasksService {
             participants: true,
           },
         },
+        reviewsOfTask: {
+          include: {
+            review: true,
+          },
+        },
       },
     });
     if (!task) {
@@ -155,6 +160,48 @@ export class TasksService {
           participantId,
           taskId,
         },
+      },
+    });
+  }
+  async validateTaskAndReview(taskId: number, reviewId: number) {
+    const task = await this.prisma.task.findUnique({
+      where: {
+        id: taskId,
+      },
+    });
+    if (!task) {
+      throw new NotFoundException('Task not found');
+    }
+
+    const review = await this.prisma.review.findUnique({
+      where: {
+        id: reviewId,
+      },
+    });
+    if (!review) {
+      throw new NotFoundException('Review not found');
+    }
+  }
+
+  async addReviewToTask(reviewId: number, taskId: number) {
+    await this.validateTaskAndReview(taskId, reviewId);
+
+    const isExistReviewInTask = await this.prisma.reviewOfTask.findUnique({
+      where: {
+        taskId_reviewId: {
+          taskId,
+          reviewId,
+        },
+      },
+    });
+    if (isExistReviewInTask) {
+      throw new BadRequestException('Review already in task');
+    }
+
+    return await this.prisma.reviewOfTask.create({
+      data: {
+        taskId,
+        reviewId,
       },
     });
   }
