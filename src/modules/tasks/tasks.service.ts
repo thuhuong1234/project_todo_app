@@ -11,7 +11,16 @@ import { PrismaService } from 'prisma.service';
 export class TasksService {
   constructor(private prisma: PrismaService) {}
   async create(createTaskDto: CreateTaskDto) {
-    return await this.prisma.task.create({ data: createTaskDto });
+    const { startTime, endTime, ...rest } = createTaskDto;
+    const startDate = startTime ? new Date(startTime).toISOString() : undefined;
+    const endDate = endTime ? new Date(endTime).toISOString() : undefined;
+    return await this.prisma.task.create({
+      data: {
+        ...rest,
+        startTime: startDate,
+        endTime: endDate,
+      },
+    });
   }
 
   async findAll(page: number, limit: number) {
@@ -20,6 +29,9 @@ export class TasksService {
     const task = await this.prisma.task.findMany({
       skip,
       take: limit,
+      orderBy: {
+        endTime: 'asc',
+      },
     });
     const total = task.length;
     const pages = Math.ceil(total / limit);
